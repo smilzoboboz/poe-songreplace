@@ -1,0 +1,4 @@
+c library build example (from setuptools)
+
+gcc -pthread -DNDEBUG -march=i686 -mtune=generic -O2 -pipe -fstack-protector --param=ssp-buffer-size=4 -march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 -fPIC -I/usr/include/python2.7 -c src/modules/screenBrightness.c -o build/temp.linux-i686-2.7/src/modules/screenBrightness.o
+gcc -pthread -shared -Wl,-O1,--sort-common,--as-needed,-z,relro -Wl,-O1,--sort-common,--as-needed,-z,relro -march=i686 -mtune=generic -O2 -pipe -fstack-protector-strong --param=ssp-buffer-size=4 -D_FORTIFY_SOURCE=2 build/temp.linux-i686-2.7/src/modules/screenBrightness.o -L/usr/lib -lX11 -lpython2.7 -o build/lib.linux-i686-2.7/calise/screenBrightness.so
