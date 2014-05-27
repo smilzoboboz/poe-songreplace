@@ -79,7 +79,14 @@ get_color_pixels(PyObject *self, PyObject *args)
             r=((int) p >> 16) & 0xFF;
             g=((int) p >> 8) & 0xFF;
             b=((int) p) & 0xFF;
-            // output format: WWWHWWWHWWWH...
+            // menu-only check
+            if ( r == 114 && g == 88 && b == 57 && i < 20 && k == 4)
+            {
+                //printf("height: %i // r: %i, g: %i, b: %i\n", k, r, g, b);
+                matching_pixels[counter] = 900 + i;
+                counter += 1;
+            }
+            // normal pixel matcher
             if ( r == cr && g == cg && b == cb && i > 9)
             {
                 if ( counter < 100 )

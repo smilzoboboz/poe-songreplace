@@ -2,6 +2,7 @@
 
 #global
 import os
+import sys
 import time
 from subprocess import Popen
 
@@ -14,7 +15,7 @@ globalvol = 25
 pipefile = '/tmp/mplayer_pipe'
 currentzone = 'Menu'
 
-
+'''
 def loadenv():
     os.mkfifo(pipefile)
     Popen([
@@ -30,32 +31,39 @@ def loadsong(songfile):
             time.sleep(1.5/globalvol)
         fp.write('volume %d 1\n' % globalvol)
         fp.write('loadfile \"%s\"\n' % songfile)
+'''
 
 def grabscreen():
     pixel_list = screen.get_pixeldata(os.getenv('DISPLAY'), '875621')
-    if not pixel_list:
-        Popen(['xte','\'key Tab\''])
-        pixel_list = screen.get_pixeldata(os.getenv('DISPLAY'), '875621')
-        Popen(['xte','\'key Tab\''])
-        if not pixel_list:
-            return None
+    #if not pixel_list:
+    #    Popen(['xte','\'key Tab\''])
+    #    pixel_list = screen.get_pixeldata(os.getenv('DISPLAY'), '875621')
+    #    Popen(['xte','\'key Tab\''])
+    #    if not pixel_list:
+    #        return None
     return pixel_list
 
 def pixelmatch():
-    match = True
     pixels = grabscreen()
-    
     for zone in zonedata.zonelist:
-        for idx in range(len(pixels)):
-            if pixels[idx] == zonedata.zones[zone]['pixels'][idx]:
-                match *= True
-            else:
-                match *= False
-                break
-        if match:
-            print("You're in %s. GOTCHA!" % zone)
-            break
+        for serie in zonedata.zones[zone]['pixels']:
+            matchcount = 0
+            for idx in range(len(pixels)):
+                if pixels[idx] in serie:
+                    matchcount += 1
+                if idx > 5 and matchcount == 0:
+                    break
+            if matchcount > len(pixels) * 0.9:
+                global currentzone
+                print("You're in %s (you were in %s). GOTCHA!" % (zone, currentzone))
+                if zone != currentzone:
+                    Popen(['bash', 'songreplace.sh',
+                           zonedata.zones[zone]['song']])
+                    currentzone = zone
+                return
 
 
 if __name__ == '__main__':
-    pixelmatch()
+    while True:
+        pixelmatch()
+        time.sleep(2)
